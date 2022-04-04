@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-
 class LinearSpline:
     def __init__(self):
         self.values = []
@@ -20,8 +18,6 @@ class LinearSpline:
                     break
                 tk,vk = val
         return resK
-
-
 class LinearSpline3D:
     splinex = 0
     spliney = 0
@@ -38,7 +34,6 @@ class LinearSpline3D:
     def interpolate(self, t):
         return self.splinex.interpolate(t), self.spliney.interpolate(t), self.splinez.interpolate(t)
 
-
 if __name__ == "__main__":
     spline = LinearSpline()
     spline.add_entry(0., 0.)
@@ -52,6 +47,5 @@ if __name__ == "__main__":
     ys = []
     for x in xs:
         ys.append(spline.interpolate(x))
-
     plt.plot(xs, ys)
     plt.show()

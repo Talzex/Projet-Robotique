@@ -6,19 +6,6 @@ from scipy import optimize
 import matplotlib.pyplot as pyplot
 import interpolation as intp
 def sandbox(t):
-    """
-    python simulator.py -m sandbox
-
-    Un premier bac à sable pour faire des expériences
-
-    La fonction reçoit le temps écoulé depuis le début (t) et retourne une position cible
-    pour les angles des 12 moteurs
-
-    - Entrée: t, le temps (secondes écoulées depuis le début)
-    - Sortie: un tableau contenant les 12 positions angulaires cibles (radian) pour les moteurs
-    """
-
-    # Par exemple, on envoie un mouvement sinusoidal
     targets = [0]*12
 
     targets[1] = np.sin(-90)
@@ -44,40 +31,15 @@ def sandbox(t):
     return targets
 
 def direct(alpha, beta, gamma):
-    """
-    python simulator.py -m direct
-
-    Le robot est figé en l'air, on ne contrôle qu'une patte
-
-    Reçoit en argument la cible (alpha, beta, gamma) des degrés de liberté de la patte, et produit
-    la position (x, y, z) atteinte par le bout de la patte
-
-    - Sliders: les angles des trois moteurs (alpha, beta, gamma)
-    - Entrées: alpha, beta, gamma, la cible (radians) des moteurs
-    - Sortie: un tableau contenant la position atteinte par le bout de la patte (en mètres)
-    """
     l1, l2, l3 = 45/1000, 65/1000, 87/1000
     xp = l1 + math.cos(beta)*l2 + math.cos(beta - gamma)*l3
     yp = math.sin(beta)*l2 + math.sin(beta - gamma)*l3
-    
     x = math.cos(alpha) * xp 
     y = math.sin(alpha) * xp 
     z = yp
     return [x,y,z]
 
 def inverse(x, y, z):
-    """
-    python simulator.py -m inverse
-
-    Le robot est figé en l'air, on ne contrôle qu'une patte
-
-    Reçoit en argument une position cible (x, y, z) pour le bout de la patte, et produit les angles
-    (alpha, beta, gamma) pour que la patte atteigne cet objectif
-
-    - Sliders: la position cible x, y, z du bout de la patte
-    - Entrée: x, y, z, une position cible dans le repère de la patte (mètres), provenant du slider
-    - Sortie: un tableau contenant les 3 positions angulaires cibles (en radians)
-    """
     l1, l2, l3 = 45/1000, 65/1000, 87/1000
     #Alpha
     alpha = np.arctan2(y,x)
@@ -86,16 +48,12 @@ def inverse(x, y, z):
     moteur_a = np.array([l1*np.cos(alpha),l1*np.sin(alpha),0])
     point = np.array([x,y,z])
     dist_ac = np.linalg.norm(point-moteur_a) #Distance du moteur au point C
-
     division = ((l2**(2)+l3**(2)-dist_ac**(2)))/(2*l2*l3)
     if(division > 1):
         division = 1
     if(division < -1):
         division = -1
-
     gamma = -np.arccos(division)+np.pi
-
-    #print(gamma)
 
     #Beta
     epsilon = np.arcsin(z/dist_ac)
@@ -104,26 +62,13 @@ def inverse(x, y, z):
         divisionsigma = 1
     if(divisionsigma < -1):
         divisionsigma = -1
-
     sigma = np.arccos(divisionsigma)
-    
-
     beta = sigma + epsilon
+
     return [alpha,beta,gamma]
 
 
 def draw(t):
-    """
-    python simulator.py -m draw
-
-    Le robot est figé en l'air, on ne contrôle qu'une patte
-
-    Le but est, à partir du temps donné, de suivre une trajectoire de triangle. Pour ce faire, on
-    utilisera une interpolation linéaire entre trois points, et la fonction inverse précédente.
-
-    - Entrée: t, le temps (secondes écoulées depuis le début)
-    - Sortie: un tableau contenant les 3 positions angulaires cibles (en radians)
-    """
     temps = 3
     spline = intp.LinearSpline3D()
     spline.add_entry(0,            0.15,  0.123,     -0.123)
@@ -136,19 +81,8 @@ def draw(t):
 
 
 def legs(leg1, leg2, leg3, leg4):
-    """
-    python simulator.py -m legs
-
-    Le robot est figé en l'air, on contrôle toute les pattes
-
-    - Sliders: les 12 coordonnées (x, y, z) du bout des 4 pattes
-    - Entrée: des positions cibles (tuples (x, y, z)) pour le bout des 4 pattes
-    - Sortie: un tableau contenant les 12 positions angulaires cibles (radian) pour les moteurs
-    """
     targets = [0]*12
-
     pi = np.pi
-
     teta = -3*(pi/4)
     newLeg1 = ((leg1[0]*np.cos(teta)-leg1[1]*np.sin(teta))-0.04, leg1[0]*np.sin(teta) + leg1[1]*np.cos(teta), leg1[2])
     
@@ -185,18 +119,6 @@ def legs(leg1, leg2, leg3, leg4):
     return targets
 
 def walk(t, speed_x, speed_y, speed_rotation):
-    """
-    python simulator.py -m walk
-
-    Le but est d'intégrer tout ce que nous avons vu ici pour faire marcher le robot
-
-    - Sliders: speed_x, speed_y, speed_rotation, la vitesse cible du robot
-    - Entrée: t, le temps (secondes écoulées depuis le début)
-            speed_x, speed_y, et speed_rotation, vitesses cibles contrôlées par les sliders
-    - Sortie: un tableau contenant les 12 positions angulaires cibles (radian) pour les moteurs
-    """
-    targets = [0]*12
-
     temps = 3
     spline = intp.LinearSpline3D()
     spline.add_entry(0,            -0.057, 0.136, -0.104)
